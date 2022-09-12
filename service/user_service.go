@@ -11,9 +11,9 @@ type UserServiceInterface interface {
 	//user methods
 	ListUsers() (users []models.UserList, err error)
 	CreateUser(user models.User) (createduser models.User, err error)
-	//GetUser(param interface{}) (user models.User, err error)
+	GetUser(variable interface{}) (user models.User, err error)
 	UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error)
-	GetUserByEmail(email string) (user models.User, err error)
+	//GetUserByEmail(email string) (user models.User, err error)
 	DeleteUser(uid int) (id int, err error)
 	// login(authdetails models.Authentication) (err error)
 }
@@ -33,7 +33,6 @@ func InitUserService(r repo.UserRepoInterface) UserServiceInterface {
 
 func (us *userService) ListUsers() (users []models.UserList, err error) {
 	users, err = us.repo.ListUser()
-	//fmt.Println("service layer: ", users)
 	if err != nil {
 		return
 	}
@@ -64,13 +63,14 @@ func (us *userService) CreateUser(user models.User) (createduser models.User, er
 // 	return
 // }
 
-// func (us *userService) GetUser(param interface{}) (user models.User, err error) {
-// 	user, err = us.repo.GetUser(param)
-// 	if err != nil {
-// 		return
-// 	}
-// 	return
-// }
+func (us *userService) GetUser(variable interface{}) (user models.User, err error) {
+
+	user, err = us.repo.GetUser(variable)
+	if err != nil {
+		return
+	}
+	return
+}
 
 func (us *userService) UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error) {
 	updateUser, err = us.repo.UpdateUser(email, user)
@@ -80,13 +80,13 @@ func (us *userService) UpdateUser(email string, user models.User) (updateUser mo
 	return
 }
 
-func (us *userService) GetUserByEmail(email string) (user models.User, err error) {
-	user, err = us.repo.GetUserByEmail(email)
-	if err != nil {
-		return
-	}
-	return
-}
+// func (us *userService) GetUserByEmail(email string) (user models.User, err error) {
+// 	user, err = us.repo.GetUserByEmail(email)
+// 	if err != nil {
+// 		return
+// 	}
+// 	return
+// }
 
 func (us *userService) DeleteUser(uid int) (id int, err error) {
 	id, err = us.repo.DeleteUser(uid)

@@ -88,8 +88,7 @@ func DeleteBookHandler(bookService service.BookServiceInterface) http.HandlerFun
 		//userService.DeleteUser(uid)
 
 		if err != nil {
-			fmt.Sprintln("error....")
-			cretaeBookResponse.Message = "error in deleting book"
+			cretaeBookResponse.Message = err.Error()
 			cretaeBookResponse.StatusCode = http.StatusInternalServerError
 			res, _ := json.Marshal(cretaeBookResponse)
 			w.WriteHeader(http.StatusInternalServerError)

@@ -1,5 +1,7 @@
 package models
 
+import "github.com/golang-jwt/jwt"
+
 // User struct declaration
 type User struct {
 	User_ID   int    `json:"u_id" db:"user_id"`
@@ -49,9 +51,11 @@ type Authentication struct {
 }
 
 type Token struct {
+	UserID      int    `json:"u_id"`
 	Role        string `json:"role"`
 	Email       string `json:"email"`
 	TokenString string `json:"token"`
+	jwt.StandardClaims
 }
 
 type CretaeUserResponse struct {

@@ -3,6 +3,7 @@
 package repo
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -18,9 +19,9 @@ type UserRepoInterface interface {
 	ListUser() (usersList []models.UserList, err error)
 	CreateUser(user models.User) (createduser models.User, err error)
 	//GetUser(uid int) (user models.User, err error)
-	//	GetUser(param interface{}) (user models.User, err error)
+	GetUser(param interface{}) (user models.User, err error)
 	UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error)
-	GetUserByEmail(email string) (user models.User, err error)
+	//GetUserByEmail(email string) (user models.User, err error)
 	DeleteUser(uid int) (id int, err error)
 }
 
@@ -149,33 +150,36 @@ func (ur *userRepo) CreateUser(user models.User) (createduser models.User, err e
 	return
 }
 
-// func (ur *userRepo) GetUser(uid int) (user models.User, err error) {
+func (ur *userRepo) GetUser(variable interface{}) (user models.User, err error) {
+	//variable, err = strconv.Atoi(variable)
 
-// 	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where user_id=$1 `
-// 	//var id int
-// 	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
-// 	err = ur.db.Get(&user, sqlStatement, uid)
-// 	if err != nil {
-// 		log.Println(err)
-// 		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
-// 		return
-// 	}
-// 	return
-// }
+	switch variable.(type) {
+	case int:
+		sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where user_id=$1 `
 
-// func (ur *userRepo) GetUser(param interface{}) (user models.User, err error) {
+		err = ur.db.Get(&user, sqlStatement, variable)
+		if err != nil {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+			return
+		}
+		return
+	case string:
 
-// 	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where user_id=$1 `
-// 	//var id int
-// 	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
-// 	err = ur.db.Get(&user, sqlStatement, uid)
-// 	if err != nil {
-// 		log.Println(err)
-// 		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
-// 		return
-// 	}
-// 	return
-// }
+		sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where email=$1 `
+		//var id int
+		//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
+		err = ur.db.Get(&user, sqlStatement, variable)
+		if err != nil {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+			return
+		}
+		return
+	}
+
+	return
+}
 
 func (ur *userRepo) UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error) {
 	var newuser, olduser models.User
@@ -207,36 +211,54 @@ func (ur *userRepo) UpdateUser(email string, user models.User) (updateUser model
 	}
 
 	updateUser = models.UpdatedUserDetails(olduser, newuser)
-	//	fmt.Printf("user updated successfully,%v", id)
-	return
-}
-
-func (ur *userRepo) GetUserByEmail(email string) (user models.User, err error) {
-
-	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where email=$1 `
-	//var id int
-	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
-	err = ur.db.Get(&user, sqlStatement, email)
-	if err != nil {
-		log.Println(err)
-		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
-		return
-	}
-	//	fmt.Printf("inserted single record %v", user.User_ID)
 	return
 }
 
 func (ur *userRepo) DeleteUser(uid int) (id int, err error) {
-
+	var user models.User
 	sqlStatement := `DELETE FROM users WHERE user_id=$1 `
-	_, err = ur.db.Exec(sqlStatement, uid)
-
-	if err != nil {
-		log.Println(err)
-		err = errors.New("sorry for inconvenience, there is error in deleting user. we are working on this")
-		return
+	//_, err = ur.db.Exec(sqlStatement, uid)
+	ur.db.Get(&user, sqlStatement, uid)
+	if err == sql.ErrNoRows {
+		errorstring := err.Error()
+		if strings.Contains(errorstring, "sql: no rows in result set") {
+			err = errors.New("user with provided ID is not present in database")
+			return
+		} else {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in deleting user. we are working on this")
+			return
+		}
 	}
-	//fmt.Printf("UserDeleted Successfully %v", uid)
 	id = uid
 	return
 }
+
+// func (ur *userRepo) GetUserByEmail(email string) (user models.User, err error) {
+
+// 	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where email=$1 `
+// 	//var id int
+// 	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
+// 	err = ur.db.Get(&user, sqlStatement, email)
+// 	if err != nil {
+// 		log.Println(err)
+// 		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+// 		return
+// 	}
+// 	//	fmt.Printf("inserted single record %v", user.User_ID)
+// 	return
+// }
+
+// func (ur *userRepo) GetUser(uid int) (user models.User, err error) {
+
+// 	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where user_id=$1 `
+// 	//var id int
+// 	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
+// 	err = ur.db.Get(&user, sqlStatement, uid)
+// 	if err != nil {
+// 		log.Println(err)
+// 		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+// 		return
+// 	}
+// 	return
+// }

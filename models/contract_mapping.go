@@ -1,11 +1,5 @@
 package models
 
-import (
-	"time"
-
-	"github.com/golang-jwt/jwt"
-)
-
 func BookToBookList(b Book, bs BookStatus) (bl BookList) {
 
 	bl.BookID = b.BookID
@@ -75,21 +69,21 @@ func UpdatedUserDetails(ou User, nu User) (uu UpdateUser) {
 	return
 }
 
-func GenerateJWT(email, role string) (string, error) {
-	var mySigningKey = []byte("secret_key")
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
+// func GenerateJWT(email, role string) (string, error) {
+// 	var mySigningKey = []byte("secret_key")
+// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256)
+// 	claims := token.Claims.(jwt.MapClaims)
 
-	claims["authorized"] = true
-	claims["email"] = email
-	claims["role"] = role
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+// 	claims["authorized"] = true
+// 	claims["email"] = email
+// 	claims["role"] = role
+// 	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
 
-	tokenString, err := token.SignedString(mySigningKey)
+// 	tokenString, err := token.SignedString(mySigningKey)
 
-	if err != nil {
-		//fmt.Errorf("Something Went Wrong: %s", err.Error())
-		return "", err
-	}
-	return tokenString, nil
-}
+// 	if err != nil {
+// 		//fmt.Errorf("Something Went Wrong: %s", err.Error())
+// 		return "", err
+// 	}
+// 	return tokenString, nil
+// }

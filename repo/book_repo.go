@@ -87,14 +87,22 @@ func (br *bookRepo) CreateBook(book models.Book) (id int, err error) {
 }
 
 func (br *bookRepo) DeleteBook(bid int) (id int, err error) {
+	var book models.Book
 	sqlStatement := `DELETE FROM books WHERE book_id=$1 `
 
-	_, err = br.db.Exec(sqlStatement, bid)
+	//_, err = br.db.Exec(sqlStatement, bid)
+	err = br.db.Get(&book, sqlStatement, bid)
 
 	if err != nil {
-		log.Println(err)
-		err = errors.New("sorry for inconvenience, there is error in deleteing of book. we are working on this")
-		return
+		errorstring := err.Error()
+		if strings.Contains(errorstring, "sql: no rows in result set") {
+			err = errors.New("book with provided ID is not present in database")
+			return
+		} else {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in deleteing of book. we are working on this")
+			return
+		}
 	}
 	fmt.Printf("Book Deleted Successfully %v", bid)
 	id = bid

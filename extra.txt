@@ -7,4 +7,4 @@ login{
 one way to filter: 
 GET /user?filter_by=user_id&user_id=102
 GET /user?filter_by=email_id&email_id=sample@gmail.com
-value of filter_by and the next param shld be same else throw error
+value of filter_by and the next param shld be same else throw errorgit 
