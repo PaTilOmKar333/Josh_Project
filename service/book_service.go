@@ -9,7 +9,7 @@ import (
 
 type BookServiceInterface interface {
 	ListBooks() (bookslist []models.BookList, err error)
-	CreateBook(book models.Book) (id int, err error)
+	CreateBook(book models.Book) (createdBook models.Book, err error)
 	DeleteBook(bid int) (id int, err error)
 }
 
@@ -35,8 +35,8 @@ func (bs *bookService) ListBooks() (bookslist []models.BookList, err error) {
 	return
 }
 
-func (bs *bookService) CreateBook(book models.Book) (id int, err error) {
-	id, err = bs.repo.CreateBook(book)
+func (bs *bookService) CreateBook(book models.Book) (createdBook models.Book, err error) {
+	createdBook, err = bs.repo.CreateBook(book)
 	if err != nil {
 		return
 	}
