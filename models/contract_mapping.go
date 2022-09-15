@@ -21,6 +21,18 @@ func UserToUserList(u User, ur UserRole) (ul UserList) {
 	return
 }
 
+func UserToUserAuth(u User, ur UserRole) (ul UserAuth) {
+	ul.User_ID = u.User_ID
+	ul.FirstName = u.FirstName
+	ul.LastName = u.LastName
+	ul.Email = u.Email
+	ul.Age = u.Age
+	ul.Address = u.Address
+	ul.Password = u.Password
+	ul.Role = ur.Role
+	return
+}
+
 func BookReportToBookReportList(br BookReport, b Book, u User) (brl BookReportList) {
 
 	actualReturnDate := br.ActualReturnDate
@@ -34,6 +46,18 @@ func BookReportToBookReportList(br BookReport, b Book, u User) (brl BookReportLi
 	brl.BookReportID = br.BookReportID
 	brl.IssueDate = br.IssueDate
 	brl.ReturnDate = br.ReturnDate
+
+	//	issuedate := br.IssueDate
+
+	// fmt.Println(issuedate)
+	// if issuedate.Valid {
+	// 	brl.IssueDate = issuedate.Time
+	// 	fmt.Println(brl.IssueDate)
+	// }
+	// returndate := br.ReturnDate
+	// if returndate.Valid {
+	// 	brl.ReturnDate = returndate.Time
+	// }
 	if actualReturnDate != nil {
 		brl.BookStatus = "Book Returned"
 		brl.ActualReturnDate = *actualReturnDate
@@ -44,12 +68,30 @@ func BookReportToBookReportList(br BookReport, b Book, u User) (brl BookReportLi
 	return
 }
 func ReturnBookReportfunc(u User, b Book, br BookReport) (rbr BookReportList) {
+	//actualReturnDate := br.ActualReturnDate
 
 	actualReturnDate := br.ActualReturnDate
 
 	rbr.BookReportID = br.BookReportID
 	rbr.BookName = b.BookName
 	rbr.UserName = u.FirstName
+
+	// issuedate := br.IssueDate
+	// if issuedate.Valid {
+	// 	rbr.IssueDate = issuedate.Time
+	// 	fmt.Println(rbr.IssueDate)
+	// }
+	// returndate := br.ReturnDate
+	// if returndate.Valid {
+	// 	rbr.ReturnDate = returndate.Time
+	// }
+	// if actualReturnDate.Valid {
+	// 	rbr.BookStatus = "Book Returned"
+	// 	rbr.ActualReturnDate = *&actualReturnDate.Time
+	// } else {
+	// 	rbr.BookStatus = "Book Issued"
+	// }
+
 	rbr.IssueDate = br.IssueDate
 	rbr.ReturnDate = br.ReturnDate
 	if actualReturnDate != nil {
@@ -68,22 +110,3 @@ func UpdatedUserDetails(ou User, nu User) (uu UpdateUser) {
 	uu.NewPassword = nu.Password
 	return
 }
-
-// func GenerateJWT(email, role string) (string, error) {
-// 	var mySigningKey = []byte("secret_key")
-// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256)
-// 	claims := token.Claims.(jwt.MapClaims)
-
-// 	claims["authorized"] = true
-// 	claims["email"] = email
-// 	claims["role"] = role
-// 	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
-
-// 	tokenString, err := token.SignedString(mySigningKey)
-
-// 	if err != nil {
-// 		//fmt.Errorf("Something Went Wrong: %s", err.Error())
-// 		return "", err
-// 	}
-// 	return tokenString, nil
-// }

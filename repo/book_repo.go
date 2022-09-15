@@ -3,6 +3,7 @@
 package repo
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -87,23 +88,25 @@ func (br *bookRepo) CreateBook(book models.Book) (id int, err error) {
 }
 
 func (br *bookRepo) DeleteBook(bid int) (id int, err error) {
-	var book models.Book
-	sqlStatement := `DELETE FROM books WHERE book_id=$1 `
+	var selectbook models.Book
+	var deletebook models.Book
 
-	//_, err = br.db.Exec(sqlStatement, bid)
-	err = br.db.Get(&book, sqlStatement, bid)
+	sqlStatement1 := `select * from books WHERE book_id=$1`
+	err = br.db.Get(&selectbook, sqlStatement1, bid)
 
-	if err != nil {
-		errorstring := err.Error()
-		if strings.Contains(errorstring, "sql: no rows in result set") {
-			err = errors.New("book with provided ID is not present in database")
-			return
-		} else {
-			log.Println(err)
-			err = errors.New("sorry for inconvenience, there is error in deleteing of book. we are working on this")
-			return
-		}
+	if err == sql.ErrNoRows {
+		log.Println(err)
+		err = errors.New("book with provided ID is not present in database")
+		return
+	} else if err != nil {
+		log.Println(err)
+		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+		return
 	}
+
+	sqlStatement2 := `DELETE FROM books WHERE book_id=$1 `
+	br.db.Get(&deletebook, sqlStatement2, bid)
+
 	fmt.Printf("Book Deleted Successfully %v", bid)
 	id = bid
 	return

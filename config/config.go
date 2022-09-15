@@ -9,9 +9,10 @@ import (
 )
 
 type config struct {
-	appName string
-	appPort int
-	db      databaseConfig
+	appName   string
+	appPort   int
+	db        databaseConfig
+	secretKey string
 }
 
 var appConfig config
@@ -30,10 +31,15 @@ func Load() {
 	viper.AutomaticEnv()
 
 	appConfig = config{
-		appName: readEnvString("APP_NAME"),
-		appPort: readEnvInt("APP_PORT"),
-		db:      newDatabaseConfig(),
+		appName:   readEnvString("APP_NAME"),
+		appPort:   readEnvInt("APP_PORT"),
+		db:        newDatabaseConfig(),
+		secretKey: readEnvString("SECRETKEY"),
 	}
+}
+
+func SecretKey() string {
+	return appConfig.secretKey
 }
 
 func AppName() string {

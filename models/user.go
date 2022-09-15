@@ -4,14 +4,25 @@ import "github.com/golang-jwt/jwt"
 
 // User struct declaration
 type User struct {
-	User_ID   int    `json:"u_id" db:"user_id"`
-	FirstName string `json:"u_firstname" db:"first_name"`
-	LastName  string `json:"u_lastname" db:"last_name"`
-	Age       int    `json:"age" db:"age"`
-	Email     string `json:"email" db:"email"`
+	User_ID   int    `json:"u_id ,omitempty" db:"user_id"`
+	FirstName string `json:"u_firstname,omitempty" db:"first_name"`
+	LastName  string `json:"u_lastname,omitempty" db:"last_name"`
+	Age       int    `json:"age,omitempty" db:"age"`
+	Email     string `json:"email,omitempty" db:"email"`
 	Password  string `json:"password,omitempty" db:"password"`
-	Address   string `json:"address" db:"address"`
+	Address   string `json:"address,omitempty" db:"address"`
 	Role_ID   int    `json:"role_id,omitempty" db:"role_id"`
+}
+
+type UserAuth struct {
+	User_ID   int    `json:"u_id"`
+	FirstName string `json:"u_firstname"`
+	LastName  string `json:"u_lastname"`
+	Age       int    `json:"age"`
+	Email     string `json:"email"`
+	Password  string `json:"password,omitempty"`
+	Address   string `json:"address"`
+	Role      string `json:"role"`
 }
 
 type UpdateUser struct {
@@ -24,10 +35,10 @@ type UpdateUser struct {
 }
 
 type CreateUser struct {
-	UserID    int    `json:"user_id"`
-	FirstName string `json:"u_firstname"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	UserID    int    `json:"user_id,omitempty"`
+	FirstName string `json:"u_firstname,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Password  string `json:"password,omitempty"`
 }
 
 type UserRole struct {
@@ -46,20 +57,27 @@ type UserList struct {
 }
 
 type Authentication struct {
+	UserID   int    `json:"u_id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
-type Token struct {
-	UserID      int    `json:"u_id"`
-	Role        string `json:"role"`
-	Email       string `json:"email"`
-	TokenString string `json:"token"`
+type Claims struct {
+	UserID int    `json:"u_id"`
+	Role   string `json:"role"`
+	Email  string `json:"email"`
 	jwt.StandardClaims
 }
 
-type CretaeUserResponse struct {
-	CreateUser CreateUser `json:"created_user_details"`
+type TokenResponse struct {
+	Token      string `json:"token,omitempty"`
+	Message    string `json:"message"`
+	StatusCode int    `json:"status_code"`
+}
+
+type CreateUserResponse struct {
+	CreateUser CreateUser `json:"created_user_details,omitempty"`
 	Message    string     `json:"message"`
 	StatusCode int        `json:"status_code"`
 }
@@ -80,4 +98,9 @@ type GetUserResponse struct {
 	GotUser    User   `json:"user_list,omitempty"`
 	StatusCode int    `json:"status_code"`
 	ErrorMsg   string `json:"error_msg,omitempty"`
+}
+
+type AuthenticationResponse struct {
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"error_msg,omitempty"`
 }

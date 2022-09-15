@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type BookReport struct {
 	BookReportID     int        `json:"book_report_id" db:"bkreport_id"`
@@ -8,7 +10,7 @@ type BookReport struct {
 	UserID           int        `json:"user_id" db:"user_id"`
 	IssueDate        time.Time  `json:"issue_date" db:"issue_date"`
 	ReturnDate       time.Time  `json:"return_date" db:"return_date"`
-	ActualReturnDate *time.Time `json:"actual_return_date,omitempty" db:"actual_return_date,omitempty"`
+	ActualReturnDate *time.Time `json:"actual_return_date,omitempty" db:"actual_retun_date"`
 }
 
 type BookReportResponse struct {
@@ -18,12 +20,12 @@ type BookReportResponse struct {
 }
 
 type BookReportList struct {
-	BookReportID     int       `json:"book_report_id"`
-	BookName         string    `json:"book_name"`
-	UserName         string    `json:"user_name"`
+	BookReportID     int       `json:"book_report_id,omitempty"`
+	BookName         string    `json:"book_name,omitempty"`
+	UserName         string    `json:"user_name,omitempty"`
 	BookStatus       string    `json:"book_status,omitempty"`
-	IssueDate        time.Time `json:"issue_date"`
-	ReturnDate       time.Time `json:"return_date"`
+	IssueDate        time.Time `json:"issue_date,omitempty"`
+	ReturnDate       time.Time `json:"return_date,omitempty"`
 	ActualReturnDate time.Time `json:"actual_return_date,omitempty"`
 }
 
@@ -34,7 +36,7 @@ type BookReportListResponse struct {
 }
 
 type ReturnBookResponse struct {
-	BookReportList BookReportList `json:"book_report"`
+	BookReportList BookReportList `json:"book_report,omitempty"`
 	StatusCode     int            `json:"status_code"`
 	Message        string         `json:"error_msg,omitempty"`
 }

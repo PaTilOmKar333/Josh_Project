@@ -7,4 +7,5 @@ DB_PORT: 5432
 DB_NAME: "Library_Management"
 DB_USER: "postgres"
 DB_PASSWORD: "admin123"
+SECRETKEY: "qwertiuyt"
 

@@ -3,13 +3,15 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"project/models"
 	"project/repo"
 )
 
 type BookReportServiceInterface interface {
 	IssueBook(uid, bid int) (id int, err error)
-	GetBookReport(uid int) (bookReportLists []models.BookReportList, err error)
+	GetBookReport(ctx context.Context, uid int) (bookReportLists []models.BookReportList, err error)
 	ReturnBook(uid, bid int) (BookReport models.BookReportList, err error)
 }
 
@@ -34,11 +36,19 @@ func (brs *bookreportService) IssueBook(uid, bid int) (id int, err error) {
 	return
 }
 
-func (brs *bookreportService) GetBookReport(uid int) (bookReportLists []models.BookReportList, err error) {
-	bookReportLists, err = brs.repo.GetBookReport(uid)
-	if err != nil {
-		return
+func (brs *bookreportService) GetBookReport(ctx context.Context, uid int) (bookReportLists []models.BookReportList, err error) {
+
+	val, _ := ctx.Value("ClaimsToVerify").(*models.Claims)
+	if val.UserID == uid || val.Role == "admin" || val.Role == "superadmin" {
+		bookReportLists, err = brs.repo.GetBookReport(uid)
+		if err != nil {
+			return
+		}
+	} else {
+		err = errors.New("unauthorized user")
+
 	}
+
 	return
 }
 

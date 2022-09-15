@@ -28,7 +28,7 @@ type BookListResponse struct {
 	ErrorMsg   string     `json:"error_msg,omitempty"`
 }
 
-type CretaeBookResponse struct {
+type BookResponse struct {
 	ID         int    `json:"book_id,omitempty"`
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`

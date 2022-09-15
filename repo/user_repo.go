@@ -16,12 +16,13 @@ import (
 
 type UserRepoInterface interface {
 	//user methods
+	Login(authdetails models.Authentication) (err error)
 	ListUser() (usersList []models.UserList, err error)
 	CreateUser(user models.User) (createduser models.User, err error)
 	//GetUser(uid int) (user models.User, err error)
 	GetUser(param interface{}) (user models.User, err error)
 	UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error)
-	//GetUserByEmail(email string) (user models.User, err error)
+	GetUserByEmail(email string) (userdetails models.UserAuth, err error)
 	DeleteUser(uid int) (id int, err error)
 }
 
@@ -37,42 +38,9 @@ func InitUserRepo() UserRepoInterface {
 	return &ur
 }
 
-// func (ur *userRepo) login(authdetails models.Authentication) (err error) {
-// 	var authuser models.User
-// 	ur.db.Where("email = ?", authdetails.Email).First(&authuser)
-// 	if authuser.Email == "" {
-// 		err = SetError(err, "Username or Password is incorrect")
-// 		w.Header().Set("Content-Type", "application/json")
-// 		json.NewEncoder(w).Encode(err)
-// 		return
-// 	}
-
-// 	check := CheckPasswordHash(authdetails.Password, authuser.Password)
-
-// 	if !check {
-// 		var err Error
-// 		err = SetError(err, "Username or Password is incorrect")
-// 		w.Header().Set("Content-Type", "application/json")
-// 		json.NewEncoder(w).Encode(err)
-// 		return
-// 	}
-
-// 	validToken, err := GenerateJWT(authuser.Email, authuser.Role)
-// 	if err != nil {
-// 		var err Error
-// 		err = SetError(err, "Failed to generate token")
-// 		w.Header().Set("Content-Type", "application/json")
-// 		json.NewEncoder(w).Encode(err)
-// 		return
-// 	}
-
-// 	var token Token
-// 	token.Email = authuser.Email
-// 	token.Role = authuser.Role
-// 	token.TokenString = validToken
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(token)
-// }
+func (ur *userRepo) Login(authdetails models.Authentication) (err error) {
+	return
+}
 
 func (ur *userRepo) ListUser() (usersList []models.UserList, err error) {
 	var users []models.User
@@ -98,20 +66,6 @@ func (ur *userRepo) ListUser() (usersList []models.UserList, err error) {
 		userList := models.UserToUserList(user, userRole)
 		usersList = append(usersList, userList)
 	}
-
-	// defer rows.Close()
-
-	// for rows.Next() {
-	// 	//err = rows.Scan(&user.User_ID, &user.FirstName, &user.LastName, &user.Age, &user.Email, &user.Password, &user.Address, &user.Role_ID)
-	// 	err = rows.Scan(&user.User_ID, &user.FirstName, &user.LastName)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 		err = errors.New("sorry for inconvenience, there is error in fetching list of users. we are working on this")
-	// 		return
-	// 	}
-	// 	users = append(users, user)
-	// }
-	//	fmt.Println("repo layer: ", users)
 
 	return
 }
@@ -158,7 +112,11 @@ func (ur *userRepo) GetUser(variable interface{}) (user models.User, err error) 
 		sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where user_id=$1 `
 
 		err = ur.db.Get(&user, sqlStatement, variable)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println(err)
+			err = errors.New("no user in database with this id")
+			return
+		} else if err != nil {
 			log.Println(err)
 			err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
 			return
@@ -170,7 +128,11 @@ func (ur *userRepo) GetUser(variable interface{}) (user models.User, err error) 
 		//var id int
 		//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
 		err = ur.db.Get(&user, sqlStatement, variable)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println(err)
+			err = errors.New("no user in database with this email")
+			return
+		} else if err != nil {
 			log.Println(err)
 			err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
 			return
@@ -215,10 +177,25 @@ func (ur *userRepo) UpdateUser(email string, user models.User) (updateUser model
 }
 
 func (ur *userRepo) DeleteUser(uid int) (id int, err error) {
-	var user models.User
-	sqlStatement := `DELETE FROM users WHERE user_id=$1 `
+	var selectuser models.User
+	var deleteuser models.User
+
+	sqlStatement := `select user_id, first_name, last_name, age, email, role_id, password, address FROM users where user_id=$1 `
+	err = ur.db.Get(&selectuser, sqlStatement, uid)
+
+	if err == sql.ErrNoRows {
+		log.Println(err)
+		err = errors.New("user with provided ID is not present in database")
+		return
+	} else if err != nil {
+		log.Println(err)
+		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+		return
+	}
+
+	sqlStatement1 := `DELETE FROM users WHERE user_id=$1 `
 	//_, err = ur.db.Exec(sqlStatement, uid)
-	ur.db.Get(&user, sqlStatement, uid)
+	ur.db.Get(&deleteuser, sqlStatement1, uid)
 	if err == sql.ErrNoRows {
 		errorstring := err.Error()
 		if strings.Contains(errorstring, "sql: no rows in result set") {
@@ -234,20 +211,41 @@ func (ur *userRepo) DeleteUser(uid int) (id int, err error) {
 	return
 }
 
-// func (ur *userRepo) GetUserByEmail(email string) (user models.User, err error) {
+func (ur *userRepo) GetUserByEmail(email string) (userdetails models.UserAuth, err error) {
 
-// 	sqlStatement := `select user_id, first_name, last_name, age, email, address FROM users where email=$1 `
-// 	//var id int
-// 	//err = ur.db.QueryRow(sqlStatement, user.User_ID, user.FirstName, user.LastName, user.Age, user.Email, user.Password, user.Address, user.Role_ID).Scan(&id)
-// 	err = ur.db.Get(&user, sqlStatement, email)
-// 	if err != nil {
-// 		log.Println(err)
-// 		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
-// 		return
-// 	}
-// 	//	fmt.Printf("inserted single record %v", user.User_ID)
-// 	return
-// }
+	var user models.User
+	var userrole models.UserRole
+
+	sqlStatement := `select user_id, first_name, last_name, age, email, role_id, password, address FROM users where email=$1 `
+	err = ur.db.Get(&user, sqlStatement, email)
+
+	if err == sql.ErrNoRows {
+		log.Println(err)
+		err = errors.New("user not found")
+		return
+	} else if err != nil {
+		log.Println(err)
+		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+		return
+	}
+	roleID := user.Role_ID
+
+	sqlStatement1 := `select role_name FROM roles where role_id=$1 `
+
+	err = ur.db.Get(&userrole, sqlStatement1, roleID)
+	if err == sql.ErrNoRows {
+		log.Println(err)
+		err = errors.New("user not found")
+		return
+	} else if err != nil {
+		log.Println(err)
+		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+		return
+	}
+	userdetails = models.UserToUserAuth(user, userrole)
+
+	return
+}
 
 // func (ur *userRepo) GetUser(uid int) (user models.User, err error) {
 

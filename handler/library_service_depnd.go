@@ -9,14 +9,17 @@ type dependancies struct {
 	Userservice       service.UserServiceInterface
 	Bookservice       service.BookServiceInterface
 	BookReportService service.BookReportServiceInterface
+	AuthTokenService  service.AuthTokenInterface
 }
 
 var depnd dependancies
 
 func InitDependancies() {
 	userrepo := repo.InitUserRepo()
-	userservice := service.InitUserService(userrepo)
+	authService := service.InitAuthService()
+	userservice := service.InitUserService(userrepo, authService)
 	depnd.Userservice = userservice
+	depnd.AuthTokenService = authService
 
 	bookrepo := repo.InitBookRepo()
 	bookservice := service.InitBookService(bookrepo)

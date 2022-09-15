@@ -2,8 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"project/models"
 	"project/service"
@@ -20,17 +18,27 @@ func IssueBookHandler(bookReportService service.BookReportServiceInterface) http
 		// convert the id type from string to int
 		uid, err := strconv.Atoi(params["user_id"])
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			issueBookResponse.Message = "Unable to convert the string userid into int userid"
+			issueBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(issueBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+
+			return
 		}
 		bid, err := strconv.Atoi(params["book_id"])
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			issueBookResponse.Message = "Unable to convert the string userid into int userid"
+			issueBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(issueBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 		id, err := bookReportService.IssueBook(uid, bid)
 
 		if err != nil {
-			fmt.Sprintln("error....")
-			issueBookResponse.Message = "error in issueing book"
+			issueBookResponse.Message = err.Error()
 			issueBookResponse.StatusCode = http.StatusInternalServerError
 			res, _ := json.Marshal(issueBookResponse)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -57,14 +65,18 @@ func GetBookReportHandler(bookReportService service.BookReportServiceInterface) 
 		// convert the id type from string to int
 		uid, err := strconv.Atoi(params["user_id"])
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			bookReportListResponse.Message = "Unable to convert the string userid into int userid"
+			bookReportListResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(bookReportListResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 
-		reports, err := bookReportService.GetBookReport(uid)
+		reports, err := bookReportService.GetBookReport(r.Context(), uid)
 
 		if err != nil {
-			fmt.Sprintln("error....")
-			bookReportListResponse.Message = "error in issueing book"
+			bookReportListResponse.Message = err.Error()
 			bookReportListResponse.StatusCode = http.StatusInternalServerError
 			res, _ := json.Marshal(bookReportListResponse)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -91,22 +103,30 @@ func ReturnBookHandler(bookReportService service.BookReportServiceInterface) htt
 		// convert the id type from string to int
 		uid, err := strconv.Atoi(params["user_id"])
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			returnBookResponse.Message = "Unable to convert the string userid into int userid"
+			returnBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(returnBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 		bid, err := strconv.Atoi(params["book_id"])
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			returnBookResponse.Message = "Unable to convert the string userid into int userid"
+			returnBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(returnBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 		book, err := bookReportService.ReturnBook(uid, bid)
 
 		if err != nil {
-			fmt.Sprintln("error....")
-			returnBookResponse.Message = "error in Returning book"
+			returnBookResponse.Message = err.Error()
 			returnBookResponse.StatusCode = http.StatusInternalServerError
 			res, _ := json.Marshal(returnBookResponse)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(res)
-
 			return
 		}
 		returnBookResponse.BookReportList = book

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"project/models"
@@ -18,8 +17,7 @@ func AllBooksHandler(bookService service.BookServiceInterface) http.HandlerFunc 
 
 		books, err := bookService.ListBooks()
 		if err != nil {
-			fmt.Sprintln("error....")
-			listBooks.ErrorMsg = "list not render"
+			listBooks.ErrorMsg = err.Error()
 			listBooks.StatusCode = http.StatusInternalServerError
 			res, _ := json.Marshal(listBooks)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -31,9 +29,7 @@ func AllBooksHandler(bookService service.BookServiceInterface) http.HandlerFunc 
 		listBooks.StatusCode = http.StatusOK
 
 		w.WriteHeader(http.StatusOK)
-		//	fmt.Println("handler layer", users)
 
-		//json.NewEncoder(w).Encode(users)
 		res, _ := json.Marshal(listBooks)
 		w.Write(res)
 
@@ -43,66 +39,74 @@ func AllBooksHandler(bookService service.BookServiceInterface) http.HandlerFunc 
 func CreateBooksHandler(bookService service.BookServiceInterface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book models.Book
-		var cretaeBookResponse models.CretaeBookResponse
+		var createBookResponse models.BookResponse
 
 		err := json.NewDecoder(r.Body).Decode(&book)
 
 		if err != nil {
-			log.Fatalf("unable to decode the request body. %v", err)
+			createBookResponse.Message = "unable to decode the request body."
+			createBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(createBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 
 		id, err := bookService.CreateBook(book)
 		if err != nil {
-			fmt.Sprintln("error....")
-			cretaeBookResponse.Message = err.Error()
-			cretaeBookResponse.StatusCode = http.StatusInternalServerError
-			res, _ := json.Marshal(cretaeBookResponse)
+			createBookResponse.Message = err.Error()
+			createBookResponse.StatusCode = http.StatusInternalServerError
+			res, _ := json.Marshal(createBookResponse)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(res)
-
 			return
 		}
-		cretaeBookResponse.ID = id
-		cretaeBookResponse.Message = "Book Created successfully."
-		cretaeBookResponse.StatusCode = http.StatusOK
+		createBookResponse.ID = id
+		createBookResponse.Message = "Book Created successfully."
+		createBookResponse.StatusCode = http.StatusOK
 
 		w.WriteHeader(http.StatusOK)
 
-		res, _ := json.Marshal(cretaeBookResponse)
+		res, _ := json.Marshal(createBookResponse)
 		w.Write(res)
 	}
 }
 
 func DeleteBookHandler(bookService service.BookServiceInterface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var cretaeBookResponse models.CretaeBookResponse
+		var DeleteBookResponse models.BookResponse
 		params := mux.Vars(r)
 
 		// convert the id type from string to int
 		bid, err := strconv.Atoi(params["book_id"])
 
 		if err != nil {
-			log.Fatalf("Unable to convert the string into int.  %v", err)
+			log.Print(err)
+			DeleteBookResponse.Message = "Unable to convert the string bookid into int bookid"
+			DeleteBookResponse.StatusCode = http.StatusBadRequest
+			res, _ := json.Marshal(DeleteBookResponse)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(res)
+			return
 		}
 		id, err := bookService.DeleteBook(bid)
-		//userService.DeleteUser(uid)
 
 		if err != nil {
-			cretaeBookResponse.Message = err.Error()
-			cretaeBookResponse.StatusCode = http.StatusInternalServerError
-			res, _ := json.Marshal(cretaeBookResponse)
+			DeleteBookResponse.Message = err.Error()
+			DeleteBookResponse.StatusCode = http.StatusInternalServerError
+			res, _ := json.Marshal(DeleteBookResponse)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(res)
 
 			return
 		}
-		cretaeBookResponse.ID = id
-		cretaeBookResponse.Message = "Book Deleted successfully."
-		cretaeBookResponse.StatusCode = http.StatusOK
+		DeleteBookResponse.ID = id
+		DeleteBookResponse.Message = "Book Deleted successfully."
+		DeleteBookResponse.StatusCode = http.StatusOK
 
 		w.WriteHeader(http.StatusOK)
 
-		res, _ := json.Marshal(cretaeBookResponse)
+		res, _ := json.Marshal(DeleteBookResponse)
 		w.Write(res)
 	}
 }
