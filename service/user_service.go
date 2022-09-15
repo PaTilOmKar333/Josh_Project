@@ -5,7 +5,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"project/models"
 	"project/repo"
@@ -63,14 +62,13 @@ func (us *userService) CreateUser(user models.User) (createduser models.User, er
 
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	isvalid := emailRegex.MatchString(user.Email)
-	fmt.Println(user.Email, isvalid)
 	if isvalid {
 		createduser, err = us.repo.CreateUser(user)
 		if err != nil {
 			return
 		}
 	} else {
-		err = errors.New("invalid email address")
+		err = errors.New("email address format is incorrect")
 	}
 
 	return
