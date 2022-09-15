@@ -2,11 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"project/models"
 	"project/service"
-	"regexp"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -89,40 +87,37 @@ func CreateUsersHandler(userService service.UserServiceInterface) http.HandlerFu
 			w.Write(res)
 			return
 		}
-		emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-		isvalid := emailRegex.MatchString(user.Email)
-		fmt.Println(user.Email, isvalid)
 
-		if isvalid {
-			createduser, err := userService.CreateUser(user)
-			if err != nil {
-				createUserResponse.Message = err.Error()
-				createUserResponse.StatusCode = http.StatusInternalServerError
-				res, _ := json.Marshal(createUserResponse)
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write(res)
-
-				return
-			}
-			createUserResponse.CreateUser.UserID = createduser.User_ID
-			createUserResponse.CreateUser.FirstName = createduser.FirstName
-			createUserResponse.CreateUser.Email = createduser.Email
-			createUserResponse.CreateUser.Password = createduser.Password
-			createUserResponse.Message = "User Created successfully."
-			createUserResponse.StatusCode = http.StatusOK
-
-			w.WriteHeader(http.StatusOK)
-
-			res, _ := json.Marshal(createUserResponse)
-			w.Write(res)
-
-		} else {
-			createUserResponse.Message = "Invalid email. please type valid email address."
+		createduser, err := userService.CreateUser(user)
+		if err != nil {
+			createUserResponse.Message = err.Error()
 			createUserResponse.StatusCode = http.StatusBadRequest
 			res, _ := json.Marshal(createUserResponse)
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(res)
+
+			return
 		}
+		createUserResponse.CreateUser.UserID = createduser.User_ID
+		createUserResponse.CreateUser.FirstName = createduser.FirstName
+		createUserResponse.CreateUser.Email = createduser.Email
+		createUserResponse.CreateUser.Password = createduser.Password
+		createUserResponse.Message = "User Created successfully."
+		createUserResponse.StatusCode = http.StatusOK
+
+		w.WriteHeader(http.StatusOK)
+
+		res, _ := json.Marshal(createUserResponse)
+		w.Write(res)
+
+		//	}
+		// else {
+		// 	createUserResponse.Message = "Invalid email. please type valid email address."
+		// 	createUserResponse.StatusCode = http.StatusBadRequest
+		// 	res, _ := json.Marshal(createUserResponse)
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	w.Write(res)
+		// }
 
 	}
 }

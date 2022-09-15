@@ -5,9 +5,11 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"project/models"
 	"project/repo"
+	"regexp"
 )
 
 type UserServiceInterface interface {
@@ -58,10 +60,19 @@ func (us *userService) Login(authdetails models.Authentication) (validToken stri
 }
 
 func (us *userService) CreateUser(user models.User) (createduser models.User, err error) {
-	createduser, err = us.repo.CreateUser(user)
-	if err != nil {
-		return
+
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	isvalid := emailRegex.MatchString(user.Email)
+	fmt.Println(user.Email, isvalid)
+	if isvalid {
+		createduser, err = us.repo.CreateUser(user)
+		if err != nil {
+			return
+		}
+	} else {
+		err = errors.New("invalid email address")
 	}
+
 	return
 }
 
