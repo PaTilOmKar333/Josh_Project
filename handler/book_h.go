@@ -52,7 +52,7 @@ func CreateBooksHandler(bookService service.BookServiceInterface) http.HandlerFu
 			return
 		}
 
-		id, err := bookService.CreateBook(book)
+		createdbook, err := bookService.CreateBook(book)
 		if err != nil {
 			createBookResponse.Message = err.Error()
 			createBookResponse.StatusCode = http.StatusInternalServerError
@@ -61,7 +61,7 @@ func CreateBooksHandler(bookService service.BookServiceInterface) http.HandlerFu
 			w.Write(res)
 			return
 		}
-		createBookResponse.ID = id
+		createBookResponse.ID = createdbook.BookID
 		createBookResponse.Message = "Book Created successfully."
 		createBookResponse.StatusCode = http.StatusOK
 

@@ -25,7 +25,7 @@ type BookList struct {
 type BookListResponse struct {
 	BookList   []BookList `json:"book_list,omitempty"`
 	StatusCode int        `json:"status_code"`
-	ErrorMsg   string     `json:"error_msg,omitempty"`
+	ErrorMsg   string     `json:"message,omitempty"`
 }
 
 type BookResponse struct {

@@ -12,6 +12,7 @@ import (
 type BookReportServiceInterface interface {
 	IssueBook(uid, bid int) (id int, err error)
 	GetBookReport(ctx context.Context, uid int) (bookReportLists []models.BookReportList, err error)
+	GetAllBookReport() (bookReportLists []models.BookReportList, err error)
 	ReturnBook(uid, bid int) (BookReport models.BookReportList, err error)
 }
 
@@ -47,6 +48,15 @@ func (brs *bookreportService) GetBookReport(ctx context.Context, uid int) (bookR
 	} else {
 		err = errors.New("unauthorized user")
 
+	}
+
+	return
+}
+
+func (brs *bookreportService) GetAllBookReport() (bookReportLists []models.BookReportList, err error) {
+	bookReportLists, err = brs.repo.GetAllBookReport()
+	if err != nil {
+		return
 	}
 
 	return

@@ -146,12 +146,26 @@ func (ur *userRepo) GetUser(variable interface{}) (user models.User, err error) 
 func (ur *userRepo) UpdateUser(email string, user models.User) (updateUser models.UpdateUser, err error) {
 	var newuser, olduser models.User
 
+	// fmt.Println("password: ", user.Password)
+	// fmt.Println("f name: ", user.FirstName)
+	// fmt.Println("l name: ", user.LastName)
+
 	sqlStatement1 := `select * FROM users WHERE email=$1`
 	err = ur.db.Get(&olduser, sqlStatement1, email)
 	if err != nil {
 		log.Println(err)
 		err = errors.New("sorry for inconvenience, there is error in updating user. we are working on this")
 		return
+	}
+
+	if user.Password == "" {
+		user.Password = olduser.Password
+
+	} else if user.FirstName == "" {
+		user.FirstName = olduser.FirstName
+
+	} else if user.LastName == "" {
+		user.LastName = olduser.LastName
 	}
 
 	sqlStatement2 := `UPDATE users SET first_name=$2, last_name=$3, password=$4 WHERE email=$1 RETURNING user_id`
