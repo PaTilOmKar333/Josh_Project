@@ -21,7 +21,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/book/{book_id}", IsAuthorized([]string{"superadmin", "admin"}, depnd.AuthTokenService, DeleteBookHandler(depnd.Bookservice))).Methods("DELETE")
 	router.HandleFunc("/user/{user_id}/book/{book_id}", IsAuthorized([]string{"superadmin", "admin"}, depnd.AuthTokenService, IssueBookHandler(depnd.BookReportService))).Methods("POST")
 	router.HandleFunc("/user/{user_id}/book", IsAuthorized([]string{"superadmin", "admin", "user"}, depnd.AuthTokenService, GetBookReportHandler(depnd.BookReportService))).Methods("GET")
-	router.HandleFunc("/user/book", IsAuthorized([]string{"superadmin", "admin"}, depnd.AuthTokenService, GetAllBookReportHandler(depnd.BookReportService))).Methods("GET")
+	router.HandleFunc("/bookreport", IsAuthorized([]string{"superadmin", "admin"}, depnd.AuthTokenService, GetAllBookReportHandler(depnd.BookReportService))).Methods("GET")
 	router.HandleFunc("/user/{user_id}/book/{book_id}/return", IsAuthorized([]string{"superadmin", "admin"}, depnd.AuthTokenService, ReturnBookHandler(depnd.BookReportService))).Methods("POST")
 	return router
 }
