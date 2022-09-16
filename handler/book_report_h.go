@@ -57,6 +57,31 @@ func IssueBookHandler(bookReportService service.BookReportServiceInterface) http
 	}
 }
 
+func GetAllBookReportHandler(bookReportService service.BookReportServiceInterface) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var bookReportListResponse models.BookReportListResponse
+		reports, err := bookReportService.GetAllBookReport()
+
+		if err != nil {
+			bookReportListResponse.Message = err.Error()
+			bookReportListResponse.StatusCode = http.StatusInternalServerError
+			res, _ := json.Marshal(bookReportListResponse)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(res)
+
+			return
+		}
+		bookReportListResponse.BookReportList = reports
+		bookReportListResponse.Message = "Book Report fetched successfully."
+		bookReportListResponse.StatusCode = http.StatusOK
+
+		w.WriteHeader(http.StatusOK)
+
+		res, _ := json.Marshal(bookReportListResponse)
+		w.Write(res)
+	}
+}
+
 func GetBookReportHandler(bookReportService service.BookReportServiceInterface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var bookReportListResponse models.BookReportListResponse

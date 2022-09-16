@@ -16,7 +16,7 @@ import (
 
 type BookRepoInterface interface {
 	ListBooks() (bookLists []models.BookList, err error)
-	CreateBook(book models.Book) (id int, err error)
+	CreateBook(book models.Book) (createdBook models.Book, err error)
 	DeleteBook(bid int) (id int, err error)
 }
 
@@ -59,7 +59,8 @@ func (br *bookRepo) ListBooks() (bookLists []models.BookList, err error) {
 	return
 }
 
-func (br *bookRepo) CreateBook(book models.Book) (id int, err error) {
+func (br *bookRepo) CreateBook(book models.Book) (createdBook models.Book, err error) {
+	//var createdBook models.Book
 
 	sqlStatement := `INSERT INTO books( book_name, author_name, available_book_copies,Status_id) VALUES ($1, $2, $3, $4) RETURNING book_id`
 	//var id int
@@ -81,7 +82,20 @@ func (br *bookRepo) CreateBook(book models.Book) (id int, err error) {
 
 		}
 	}
-	id = book.BookID
+	id := book.BookID
+
+	sqlStatement1 := `select * from books WHERE book_id=$1`
+	err = br.db.Get(&createdBook, sqlStatement1, id)
+
+	if err == sql.ErrNoRows {
+		log.Println(err)
+		err = errors.New("book with provided ID is not present in database")
+		return
+	} else if err != nil {
+		log.Println(err)
+		err = errors.New("sorry for inconvenience, there is error in fetching user. we are working on this")
+		return
+	}
 	//fmt.Printf("inserted single record %v", id)
 
 	return

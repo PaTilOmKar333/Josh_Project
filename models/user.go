@@ -84,23 +84,23 @@ type CreateUserResponse struct {
 
 type UserListResponse struct {
 	UserList   []UserList `json:"user_list,omitempty"`
-	Message    string     `json:"error_msg,omitempty"`
+	Message    string     `json:"message,omitempty"`
 	StatusCode int        `json:"status_code"`
 }
 
 type UpdateUserResponse struct {
 	UpdatedUser UpdateUser `json:"updated_user_details,omitempty"`
 	StatusCode  int        `json:"status_code"`
-	Message     string     `json:"error_msg,omitempty"`
+	Message     string     `json:"message,omitempty"`
 }
 
 type GetUserResponse struct {
 	GotUser    User   `json:"user_list,omitempty"`
 	StatusCode int    `json:"status_code"`
-	ErrorMsg   string `json:"error_msg,omitempty"`
+	ErrorMsg   string `json:"message,omitempty"`
 }
 
 type AuthenticationResponse struct {
 	StatusCode int    `json:"status_code"`
-	Message    string `json:"error_msg,omitempty"`
+	Message    string `json:"message,omitempty"`
 }

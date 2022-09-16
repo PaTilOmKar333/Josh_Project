@@ -32,11 +32,11 @@ type BookReportList struct {
 type BookReportListResponse struct {
 	BookReportList []BookReportList `json:"book_report_list"`
 	StatusCode     int              `json:"status_code"`
-	Message        string           `json:"error_msg,omitempty"`
+	Message        string           `json:"message,omitempty"`
 }
 
 type ReturnBookResponse struct {
 	BookReportList BookReportList `json:"book_report,omitempty"`
 	StatusCode     int            `json:"status_code"`
-	Message        string         `json:"error_msg,omitempty"`
+	Message        string         `json:"message,omitempty"`
 }

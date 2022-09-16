@@ -102,11 +102,35 @@ func ReturnBookReportfunc(u User, b Book, br BookReport) (rbr BookReportList) {
 }
 
 func UpdatedUserDetails(ou User, nu User) (uu UpdateUser) {
-	uu.OldFirstName = ou.FirstName
-	uu.OldLastName = ou.LastName
-	uu.OldPassword = ou.Password
-	uu.NewFirstName = nu.FirstName
-	uu.NewLastName = nu.LastName
-	uu.NewPassword = nu.Password
+	if ou.FirstName == nu.FirstName {
+		uu.OldLastName = ou.LastName
+		uu.OldPassword = ou.Password
+		uu.NewLastName = nu.LastName
+		uu.NewPassword = nu.Password
+	} else if ou.LastName == nu.LastName {
+		uu.OldFirstName = ou.FirstName
+		uu.OldPassword = ou.Password
+		uu.NewFirstName = nu.FirstName
+		uu.NewPassword = nu.Password
+	} else if ou.Password == nu.Password {
+		uu.OldFirstName = ou.FirstName
+		uu.OldLastName = ou.LastName
+		uu.NewFirstName = nu.FirstName
+		uu.NewLastName = nu.LastName
+	} else {
+		uu.OldFirstName = ou.FirstName
+		uu.OldLastName = ou.LastName
+		uu.OldPassword = ou.Password
+		uu.NewFirstName = nu.FirstName
+		uu.NewLastName = nu.LastName
+		uu.NewPassword = nu.Password
+	}
+
+	// uu.OldFirstName = ou.FirstName
+	// uu.OldLastName = ou.LastName
+	// uu.OldPassword = ou.Password
+	// uu.NewFirstName = nu.FirstName
+	// uu.NewLastName = nu.LastName
+	// uu.NewPassword = nu.Password
 	return
 }
